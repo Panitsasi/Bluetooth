@@ -1,0 +1,25 @@
+CREATE TABLE "Info_tests" (
+	"Advertiser_Address"	TEXT,
+	"Day_of_Attack"	TEXT,
+	"Access_Address"	TEXT,
+	"Master_Address"	TEXT,
+	"Attack"	TEXT,
+	"Port"	TEXT
+);
+
+
+CREATE TABLE "Sniffer_data" (
+	"Bookmark"	TEXT,
+	"Frame_diesh"	TEXT,
+	"Channel"	TEXT,
+	"Type"	TEXT,
+	"AddrTypeI"	TEXT,
+	"InitA_ScanA"	TEXT,
+	"AddrTypeA"	TEXT,
+	"AdvA"	TEXT,
+	"Len"	TEXT,
+	"Frame"	TEXT,
+	"Size"	TEXT,
+	"Delta"	TEXT,
+	"Timestamp"	TEXT
+);

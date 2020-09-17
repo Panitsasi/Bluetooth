@@ -1,0 +1,390 @@
+
+link_layer folder
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+1)ATT_CRUSH (att_mtu_request_crush)
+
+Test 001
+
+Continuous ATT_Exchange_MTU_Request(mtu=247) packets are sent by the transmitter
+Connection established
+T-> ATT_Exchange_MTU_Request(mtu=247)
+R->ATT_Exchange_MTU_Response
+T-> ATT_Exchange_MTU_Request(mtu=247)
+T-> ATT_Exchange_MTU_Request(mtu=247)
+T-> ATT_Exchange_MTU_Request(mtu=247)
+check_pulse_via_mtu_exchange
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+2)CHANNEL_MAP_REQ
+
+Test 001  CHANNEL_MAP_REQ OVERFLOW
+Connection established
+T->LL_FEATURE_REQ()
+R->LL_FEATURE_RSP
+T->LL_CHANNEL_MAP_REQ(chM=0x0000000001,instant=1000) LENGTH=128 Bytes
+check_pulse_via_mtu_exchange
+
+Response
+LE_LL
+LL_FEATURE_REQ 1
+LL_FEATURE_RSP 2
+LL_CHANNEL_MAP_REQ 1
+LL_UNKNOWN_RSP 2
+
+
+Test 002  CHANNEL_MAP_REQ UNDERFLOW
+Connection established
+T->LL_FEATURE_REQ()
+R->LL_FEATURE_RSP
+T->LL_CHANNEL_MAP_REQ(chM=0x0000000001,instant=1000) LENGTH(Payload)=0 Byte
+check_pulse_via_mtu_exchange
+
+Not crashed
+Response
+LE_LL
+LL_FEATURE_REQ 1
+LL_FEATURE_RSP 2
+LL_CHANNEL_MAP_REQ 1
+LL_UNKNOWN_RSP 2
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+3)CONNECTION_REQUEST_CRUSH
+
+Test 001      connection request crush with interval=0 or hop=0 ortimeout=0 or length=247 or win_size=0
+
+T->BTLE_SCAN_REQ()
+R->BTLE_SCAN_RSP
+T->BTLE_CONNECT_REQ()
+check_pulse_via_scan()
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+4)CONNECTION_UPDATE_REQ
+
+Test 001   CONNECTION_UPDATE_REQ OVERFLOW
+
+Connection established
+T->LL_FEATURE_REQ()
+R->LL_FEATURE_RSP
+T->LL_CONNECTION_UPDATE_REQ() LENGTH=128 Byte
+check_pulse_via_mtu_exchange
+
+Test 002 CONNECTION_UPDATE_REQ UNDERFLOW
+Connection established
+T->LL_FEATURE_REQ()
+R->LL_FEATURE_RSP
+T->LL_CONNECTION_UPDATE_REQ() LENGTH=0 Byte
+check_pulse_via_mtu_exchange
+
+
+Not crashed
+Response
+LE_LL
+LL_FEATURE_REQ 1
+LL_FEATURE_RSP 2
+LL_CHANNEL_MAP_REQ 1
+LL_UNKNOWN_RSP 2
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+5)DOS
+
+Test 001
+
+Connection established
+T->LL_FEATURE_REQ()
+R->LL_FEATURE_RSP
+T->LOOP(500 packets) LL_PING_REQ()
+check_pulse_via_mtu_exchange
+
+Response
+LE_LL
+LL_VERSION_IND 1
+LL_VERSION_IND 2
+LOOP
+LL_PING_REQ 1
+LL_PING_RSP 2
+LL_TERMINATE_IND 2
+
+L2CAP
+No mtu request
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+6)FEATURE_REQ
+
+Test 001   FEATURE_REQ with length overflow
+
+Connection established
+T->LL_FEATURE_REQ()
+R->LL_FEATURE_RSP
+T->LL_PING_REQ() LENGTH=100 Byte
+check_pulse_via_mtu_exchange
+
+Not crashed
+Response
+LE_LL
+LL_FEATURE_REQ 1
+LL_FEATURE_RSP 2
+LL_PING_REQ 1
+LL_UNKNOWN_RSP 2
+
+Test 002   FEATURE_REQ with length underflow
+
+Connection established
+T->LL_FEATURE_REQ()
+R->LL_FEATURE_RSP
+T->LL_PING_REQ() LENGTH=0 Byte
+check_pulse_via_mtu_exchange
+
+Not crashed
+Response
+LE_LL
+LL_FEATURE_REQ 1
+LL_FEATURE_RSP 2
+LL_PING_REQ 1
+LL_PING_RSP 2
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+7)INVALID
+
+Test 001
+
+Connection established
+T->LL_FEATURE_REQ()
+R->LL_FEATURE_RSP
+T->LL_INVALID()
+check_pulse_via_mtu_exchange
+
+
+Not crashed
+Response
+LE_LL
+LL_FEATURE_REQ 1
+LL_FEATURE_RSP 2
+Reserved  1
+LL_UNKNOWN_RSP 2
+
+
+
+
+Test 002   invalid LLID
+
+Connection established
+T->LL_FEATURE_REQ()
+R->LL_FEATURE_RSP
+T->LL_LENGTH_REQ() with LLID=0
+check_pulse_via_mtu_exchange
+
+NOT CRUSHED
+LL_FEATURE_REQ() 1
+LL_FEATURE_RSP() 2
+
+
+Not crashed
+Response
+LE_LL
+LL_FEATURE_REQ 1
+LL_FEATURE_RSP 2
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+8)INVALID_SEQUENCE
+
+Test 001   Invalid sequence attack , initial ACK bits set to 1
+
+
+T->BTLE_SCAN_REQ()
+R->BTLE_SCAN_RSP
+T->BTLE_CONNECT_REQ() with SN=1 and NESN=1
+T->LL_FEATURE_RSP()
+T->LL_VERSION_IND()
+T->LL_LENGTH_REQ()
+T->ATT_Exchange_MTU_Request()
+check_pulse_via_scan
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+9)LENGTH_REQ
+
+TEST 001 LENGTH_REQ with invalid parameters
+
+Connection established
+T->LL_FEATURE_REQ()
+R->LL_FEATURE_RSP
+T->LL_LENGTH_REQ() parameters=max_rx_bytes,max_rx_time,max_tx_bytes,max_tx_time
+check_pulse_via_mtu_exchange
+
+
+CRUSHED
+
+
+TEST 002 LENGTH_REQ with length overflow
+
+Connection established
+T->LL_FEATURE_REQ()
+R->LL_FEATURE_RSP
+T->LL_LENGTH_REQ() length=100 Byte
+check_pulse_via_mtu_exchange
+
+
+TEST 003 LENGTH_REQ with length underflow
+
+Connection established
+T->LL_FEATURE_REQ()
+R->LL_FEATURE_RSP
+T->LL_LENGTH_REQ() length=1 Byte
+check_pulse_via_mtu_exchange
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+10)LENGTH_REQ_single_test
+
+TEST 001 LENGTH_REQ with invalid parameters
+
+Connection established
+T->LL_VERSION_IND()
+R->LL_VERSION_IND
+T->LL_LENGTH_REQ() parameters=max_tx_bytes=0
+Disconnect
+check_pulse_via_scan
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+11)LLID_DEADLOCK
+
+Test 001   invalid LLID
+
+Connection established
+T->LL_FEATURE_REQ()
+R->LL_FEATURE_RSP
+T->LL_LENGTH_REQ() with LLID=0
+check_pulse_via_mtu_exchange
+
+
+Test 002 llid deadlock
+
+Connection established
+T->LL_VERSION_IND()
+R->LL_VERSION_IND
+T->LL_FEATURE_REQ()
+R->LL_FEATURE_RSP
+T->LL_LENGTH_REQ()
+R->LL_LENGTH_RSP
+T->SM_Pairing_Request() with LLID=0
+Somewhere ,Peripheral state machine will be corrupted)
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+12)PING_REQ
+
+Test 001   PING_REQ with length overflow
+
+Connection established
+T->LL_FEATURE_REQ()
+R->LL_FEATURE_RSP
+T->LL_PING_REQ() length=48 Byte
+check_pulse_via_mtu_exchange
+
+Response
+LL_FEATURE_REQ 1
+LL_FEATURE_RSP 2
+LL_PING_REQ 1
+LL_UNKNOWN_RSP 2
+
+
+
+Test 002   PING_REQ with length underflow
+
+Connection established
+T->LL_FEATURE_REQ()
+R->LL_FEATURE_RSP
+T->LL_PING_REQ() length=0 Byte
+check_pulse_via_mtu_exchange
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+13)REJECT_IND
+
+Test 001   overflow REJECT_IND packet
+
+Connection established
+T->LL_FEATURE_REQ()
+R->LL_FEATURE_RSP
+T->LL_REJECT_IND() length=256 Byte
+check_pulse_via_mtu_exchange
+
+Test 002   REJECT_IND packet with invalid error code
+
+Connection established
+T->LL_FEATURE_REQ()
+R->LL_FEATURE_RSP
+T->LL_REJECT_IND() invalid error code = 0x46
+check_pulse_via_mtu_exchange
+
+Test 003 normal packet
+
+Connection established
+T->LL_FEATURE_REQ()
+R->LL_FEATURE_RSP
+T->LL_REJECT_IND() length=256 Byte
+check_pulse_via_mtu_exchange
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+14)START_ENC_REQ
+
+Test 001   START_ENC_REQ with length overflow
+
+Connection established
+T->LL_FEATURE_REQ()
+R->LL_FEATURE_RSP
+T->LL_START_ENC_REQ() length=100 Byte
+check_pulse_via_mtu_exchange
+
+Test 002    START_ENC_REQ with length underflow
+
+Connection established
+T->LL_FEATURE_REQ()
+R->LL_FEATURE_RSP
+T->LL_START_ENC_REQ() length=1 Byte
+check_pulse_via_mtu_exchange
+
+Not Crushed
+Response
+LL_FEATURE_REQ() 1
+LL_FEATURE_RSP() 2
+LL_START_ENC_REQ() 1
+
+L2CAP
+error
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+smp folder
+
+15)SILENT_OVERFLOW
+
+Test 001
+
+
+T->BTLE_SCAN_REQ()
+R->BTLE_SCAN_RSP
+T->BTLE_CONNECT_REQ()
+T->LL_VERSION_IND()
+R->LL_VERSION_IND
+T->LL_LENGTH_REQ()
+R->Pairing Request
+check_pulse_via_scan
+
+
+
+

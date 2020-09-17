@@ -1,0 +1,7 @@
+[TESTBED]
+COM_PORT_NRF=COM36
+ADVERTISER_ADDRESS = 80:ea:ca:17:00:11
+MASTER_ADDRESS = 5d:36:ac:90:0b:22
+ACCESS_ADDRESS = 0x9a328370
+CONNECTION_TO_DATABASE = mongodb://web:XXX@cluster0-shard-00-00.c4jof.mongodb.net:27017,cluster0-shard-00-01.c4jof.mongodb.net:27017,cluster0-shard-00-02.c4jof.mongodb.net:27017/Bluetooth_Attack?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true&w=majority
+DATABASE_VERSION=SQL
